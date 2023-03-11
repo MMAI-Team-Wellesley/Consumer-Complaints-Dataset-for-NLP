@@ -4,19 +4,17 @@ import string
 import nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
-
-from preprocessing import clean_text, preprocess_data
 import tensorflow as tf
 from tensorflow import keras
 
-# Use the clean_text function to clean the input data
-text = "This is some sample text."
-cleaned_text = clean_text(text)
+'''
+This file should only be modified by the model building team in case of merge conflicts.
+'''
 
-# Use the preprocess_data function to preprocess the input data
-df = pd.read_csv('data.csv')
-preprocessed_df = preprocess_data(df)
-
+# Read the data into a dataframe
+# run preprocessing.py first to generate the csv file
+df = pd.read_csv('complaints_processed_clean.csv')
+df.head(5)
 '''
 Sample code for building the model. Feel free to change the model architecture.
 '''
@@ -35,4 +33,4 @@ def build_model(df):
 
 
 # Use the preprocessed data to build the model
-model = build_model(preprocessed_df)
+model = build_model(df)
