@@ -1,5 +1,6 @@
 from collections import Counter
 import pandas as pd
+import numpy as np
 import re
 import string
 import nltk
@@ -10,7 +11,10 @@ import seaborn as sns
 from wordcloud import WordCloud
 from textblob import TextBlob
 from sklearn.feature_extraction.text import TfidfVectorizer
-
+from flair.data import Sentence
+from flair.embeddings import WordEmbeddings, DocumentPoolEmbeddings
+from tqdm import tqdm
+tqdm.pandas()
 '''
 This function cleans the text in the "narrative" column of the dataframe. 
 It removes URLs, HTML tags, punctuation, numbers, stopwords, and lemmatizes the text.
@@ -103,7 +107,30 @@ def generate_tfidf_dataframe(df):
 
     return df_tfidf_clean
 
-def preprocess_data(df):
+
+
+def tokenize_text(text):
+    return nltk.word_tokenize(text)
+
+def load_glove_vectors(glove_file):
+    embeddings = {}
+    with open(glove_file, 'r', encoding='utf-8') as file:
+        for line in file:
+            values = line.strip().split()
+            word = values[0]
+            vector = np.asarray(values[1:], dtype='float32')
+            embeddings[word] = vector
+    return embeddings
+
+def get_glove_sentence_vector(sentence, embeddings):
+    words = nltk.word_tokenize(sentence)
+    words = [word for word in words if word in embeddings]
+    if words:
+        return np.mean([embeddings[word] for word in words], axis=0)
+    else:
+        return np.zeros(embeddings[next(iter(embeddings))].shape)
+    
+def preprocess_data(df, embeddings):
     # Drop the missing rows
     df = df.dropna()
     # Remove the "Unnamed: 0" column
@@ -113,16 +140,20 @@ def preprocess_data(df):
     # Clean the "narrative" column
     df['narrative'] = df['narrative'].apply(lambda x: clean_text(x))
     df = generate_tfidf_dataframe(df)
+    df['glove_embeddings'] = df['narrative'].progress_apply(lambda x: get_glove_sentence_vector(str(x), embeddings))
+    df['tokens'] = df['narrative'].progress_apply(lambda x: tokenize_text(str(x)))
     return df
 
 def main():
     # import the dataset "complaints_processed.csv"
     df = pd.read_csv('complaints_processed.csv')
-    data_exploration(df)
-    df_clean = preprocess_data(df)
+    # pre-trained GloVe embeddings: https://nlp.stanford.edu/projects/glove/
+    glove_vectors = load_glove_vectors('glove.6B.100d.txt')
+    # data_exploration(df)
+    df_clean = preprocess_data(df, glove_vectors)
     print(df_clean.head(5))
     # export the cleaned dataset to a csv file
-    df_clean.to_csv('complaints_processed_clean.csv')
+    df_clean.to_csv('complaints_processed_clean_v2.csv')
 
 if __name__ == '__main__':
     main()

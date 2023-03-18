@@ -19,3 +19,7 @@ I might write a documentation for setting up git on your computer later.
 We can modify this README file and display our outcomes after we've finished the project.
 
 I'm happy to help if you have any questions!
+
+# Essential files:
+1. complaints_processed.csv
+2. For the v2 dataset, you need to down load some pre-trained GloVe word embedding files from https://nlp.stanford.edu/projects/glove/, otherwise it will take days to run.
