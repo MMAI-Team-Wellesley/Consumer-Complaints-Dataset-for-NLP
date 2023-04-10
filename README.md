@@ -22,6 +22,6 @@ I'm happy to help if you have any questions!
 
 # Essential files:
 1. complaints_processed.csv
-2. customer_complaints_clean_vF.csv
+2. customer_complaints_clean_vF.csv, please note that the dataset on github might not be complete because of the file size limit, if that's the case please run the preprocessing code to generate the cleaned dataset.
 3. For the v2 dataset, you need to down load some pre-trained GloVe word embedding file (in our case glove.6B.100d.txt) from https://nlp.stanford.edu/projects/glove/ .
 4. For models, if you are going to load dataset locally or on google colab, you might need to change the dataset file path. If you are using google colab, please make sure you upload all the necessary files.
